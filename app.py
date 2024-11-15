@@ -11,7 +11,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from PIL import Image
 
-import utils_functions as uf
+import app_functions as uf
 
 ### Streamlit App
 image = Image.open('title02.png')
