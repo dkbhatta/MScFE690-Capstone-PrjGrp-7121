@@ -1,3 +1,4 @@
+# Use `pip install -r requirements.txt` command in shell. Alternatively `pip3 install -r requirements.txt` can also be used.
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -33,8 +34,7 @@ st.write_stream(uf.stream_data(data=welcome_statement))
 if st.sidebar.button("Run Strategy"):
     tab1, tab2 = st.tabs(["Tabular", "Plots"])
     with tab1:
-        # st.subheader("Tab 1 Content")
-        ## Currency Conversion
+        ## Currency Conversion (free api)
         api_key = "415715a52d797424cb41a1b8"
         url = f"https://v6.exchangerate-api.com/v6/{api_key}/pair/USD/INR"
 
@@ -131,8 +131,6 @@ if st.sidebar.button("Run Strategy"):
             # Add a col for profit/loss
             results_df['Profit/Loss (INR)'] = ''
             results_df['Profit/Loss (USD)'] = ''
-            # st.write('after transpose')
-            # st.write(f'col: {results_df.columns}')
             
             for i in range(len(results_df)):
                 results_df['Profit/Loss (INR)'][i] =  results_df['Final Portfolio Value'][i] - converted_initial_capital_inr
@@ -140,7 +138,6 @@ if st.sidebar.button("Run Strategy"):
 
         st.write("Preparing results.")
         st.subheader(f"Results for {selected_strategy}:", divider=True)
-        # st.dataframe(results_df)
         st.table(results_df.round(3))
         st.caption(":red[_Any NA values in the table suggest that there were no trade signals during the selected period._]")
 
