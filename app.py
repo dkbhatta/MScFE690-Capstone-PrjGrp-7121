@@ -29,7 +29,7 @@ initial_capital_usd = st.sidebar.number_input("Initial Capital ($)", min_value=1
 welcome_statement = """This web app is designed as a part of capstone at WorldQuant University. Please make sure that the start date is atleast 6 months from today. 
 Emphasis will be on identifying optimal entry and exit points and following the simple rule of
 achieving returns: minimizing risks and maximizing profits."""
-st.write_stream(uf.stream_data(data=welcome_statement))
+st.write(welcome_statement)
 
 if st.sidebar.button("Run Strategy"):
     tab1, tab2 = st.tabs(["Tabular", "Plots"])
@@ -44,7 +44,7 @@ if st.sidebar.button("Run Strategy"):
 
         converted_initial_capital_inr = initial_capital_usd * current_conversion_rate
         currency_convert_statement = f"With the current conversion rate, ${initial_capital_usd} would be equal to ₹{converted_initial_capital_inr}."
-        st.write_stream(uf.stream_data(data=currency_convert_statement))
+        st.write(currency_convert_statement)
 
         with st.status("Operation in progress. Please wait."):
             ## Data Download
@@ -143,7 +143,7 @@ if st.sidebar.button("Run Strategy"):
 
         st.divider()
 
-        st.write_stream(uf.stream_data("The following tables might give better insights."))
+        st.write("The following tables might give better insights.")
         
         profitable_trades_df = pd.DataFrame(columns=['Ticker', 'Profit (INR)', 'Profit (USD)'])
 
