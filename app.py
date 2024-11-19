@@ -43,7 +43,7 @@ if st.sidebar.button("Run Strategy"):
         current_conversion_rate = data['conversion_rate']
 
         converted_initial_capital_inr = initial_capital_usd * current_conversion_rate
-        currency_convert_statement = f"With the current conversion rate, ${initial_capital_usd} would be equal to ₹{converted_initial_capital_inr.round(2)}."
+        currency_convert_statement = f"With the current conversion rate, ${initial_capital_usd} would be equal to ₹{round(converted_initial_capital_inr, 2)}."
         st.write(currency_convert_statement)
 
         with st.status("Operation in progress. Please wait."):
