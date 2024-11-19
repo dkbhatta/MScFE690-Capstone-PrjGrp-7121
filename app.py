@@ -180,7 +180,7 @@ if st.sidebar.button("Run Strategy"):
         # Display DataFrames in each container
         with container1:
             st.subheader("Profitable Stocks")
-            st.caption("Sorted alphabetically (A➡Z)")
+            st.caption(f"Sorted alphabetically (A➡Z). {len(hide_index_profitable_trades_df)} stocks were found to be profitable.")
             st.table(hide_index_profitable_trades_df.round(3))
 
         with container2:
