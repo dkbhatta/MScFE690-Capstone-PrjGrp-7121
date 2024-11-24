@@ -43,7 +43,7 @@ if st.sidebar.button("Run Strategy"):
         current_conversion_rate = data['conversion_rate']
 
         converted_initial_capital_inr = initial_capital_usd * current_conversion_rate
-        currency_convert_statement = f"With the current conversion rate, ${initial_capital_usd} would be equal to ₹{converted_initial_capital_inr}."
+        currency_convert_statement = f"With the current conversion rate, ${initial_capital_usd} would be equal to ₹{round(converted_initial_capital_inr, 2)}."
         st.write(currency_convert_statement)
 
         with st.status("Operation in progress. Please wait."):
@@ -103,6 +103,7 @@ if st.sidebar.button("Run Strategy"):
             }
 
             st.write(f"Applying {selected_strategy} strategy (6/7)")
+            st.write("Preparing results (7/7")
 
             results = {}
             dataframes = {}
@@ -136,7 +137,7 @@ if st.sidebar.button("Run Strategy"):
                 results_df['Profit/Loss (INR)'][i] =  results_df['Final Portfolio Value'][i] - converted_initial_capital_inr
                 results_df['Profit/Loss (USD)'][i] =  results_df['Profit/Loss (INR)'][i] / current_conversion_rate
 
-        st.write("Preparing results.")
+        
         st.subheader(f"Results for {selected_strategy}:", divider=True)
         st.table(results_df.round(3))
         st.caption(":red[_Any NA values in the table suggest that there were no trade signals during the selected period._]")
@@ -179,7 +180,7 @@ if st.sidebar.button("Run Strategy"):
         # Display DataFrames in each container
         with container1:
             st.subheader("Profitable Stocks")
-            st.caption("Sorted alphabetically (A➡Z)")
+            st.caption(f"Sorted alphabetically (A➡Z). {len(hide_index_profitable_trades_df)} stocks were found to be profitable.")
             st.table(hide_index_profitable_trades_df.round(3))
 
         with container2:
@@ -451,7 +452,7 @@ if st.sidebar.button("Compare Strategies"):
 
         with container4:
             st.subheader("Profitable Stocks")
-            st.caption("Sorted by Profit (High➡Low)")
+            st.caption(f"{len(hide_index_sorted_collective_profitable_stocks_df)} stocks were found to be profitable. Sorted by Profit (High➡Low)")
             # st.dataframe(sorted_profitable_stocks)
             st.table(hide_index_sorted_collective_profitable_stocks_df.round(3))
 

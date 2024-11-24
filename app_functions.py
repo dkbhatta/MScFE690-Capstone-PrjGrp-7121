@@ -159,35 +159,113 @@ def stream_data(data):
         yield word + " "
         time.sleep(0.02)
 
-def filter_dataframes_and_plot(selected_strategy, dataframes, sorted_profitable_stocks):
-    filtered_dataframes = {}
+# def filter_dataframes_and_plot(selected_strategy, dataframes, sorted_profitable_stocks):
+#     filtered_dataframes = {}
 
-    for ticker in sorted_profitable_stocks['Ticker']:
+#     for ticker in sorted_profitable_stocks['Ticker']:
+#         if ticker in dataframes[selected_strategy]:
+#             # Extract the dataframe for the current ticker
+#             df = dataframes[selected_strategy][ticker]
+#             filtered_dataframes[ticker] = df
+
+#             # Create and display plot
+#             st.subheader(f"{ticker} - {selected_strategy} Entry and Exit Points")
+#             plt.figure(figsize=(15, 7))
+#             plt.plot(df.index, df['Close'], label='Close Price', alpha=0.5)
+#             plt.title(f'{ticker} Entry and Exit Points')
+#             plt.xlabel('Date')
+#             plt.ylabel('Price')
+
+#             # Plot entry and exit points
+#             plt.scatter(df[df['entry_long']].index, df[df['entry_long']]['Close'],
+#                         color='g', label='Entry Long', marker='^', s=100)
+#             plt.scatter(df[df['entry_short']].index, df[df['entry_short']]['Close'],
+#                         color='r', label='Entry Short', marker='v', s=100)
+#             plt.scatter(df[df['exit']].index, df[df['exit']]['Close'],
+#                         color='black', label='Exit', marker='x', s=100)
+
+#             plt.legend()
+#             plt.grid()
+#             plt.tight_layout()
+
+#             st.pyplot()
+#             st.divider() 
+
+def filter_dataframes_and_plot(selected_strategy, dataframes, sorted_profitable_stocks):
+    all_filtered_dataframes = {}
+    
+    # Count total plots to be generated
+    total_plots = len([ticker for ticker in sorted_profitable_stocks['Ticker'] 
+                      if ticker in dataframes[selected_strategy]])
+    
+    st.write(f"Total plots to be generated: {total_plots}")
+    
+
+    progress_bar = st.progress(0)
+    plot_counter = st.empty()
+    
+    for idx, ticker in enumerate(sorted_profitable_stocks['Ticker'], 1):
         if ticker in dataframes[selected_strategy]:
+            plot_counter.write(f"Generating plot {idx} of {total_plots}: {ticker}")
+            
             # Extract the dataframe for the current ticker
             df = dataframes[selected_strategy][ticker]
-            filtered_dataframes[ticker] = df
-
-            # Create and display plot
-            st.subheader(f"{ticker} - {selected_strategy} Entry and Exit Points")
-            plt.figure(figsize=(15, 7))
-            plt.plot(df.index, df['Close'], label='Close Price', alpha=0.5)
-            plt.title(f'{ticker} Entry and Exit Points')
-            plt.xlabel('Date')
-            plt.ylabel('Price')
-
+            all_filtered_dataframes[ticker] = df
+            
+            # Create subplots
+            fig, axes = plt.subplots(3, 1, figsize=(15, 10), dpi=300, sharex=True, 
+                                   gridspec_kw={'height_ratios': [3, 1, 1]})
+            
+            # Plot Bollinger Bands and Closing Price
+            axes[0].plot(df.index, df['Close'], label='Close Price', alpha=0.7)
+            axes[0].plot(df.index, df['bb_high'], color='grey', alpha=0.5)
+            axes[0].plot(df.index, df['bb_low'], color='grey', alpha=0.5)
+            axes[0].fill_between(df.index, df['bb_high'], df['bb_low'], 
+                               color='grey', alpha=0.1, label='Bollinger Bands')
+            
+            axes[0].set_title(f"{ticker} - {selected_strategy} Entry and Exit Points")
+            axes[0].set_ylabel('Price')
+            axes[0].grid()
+            
             # Plot entry and exit points
-            plt.scatter(df[df['entry_long']].index, df[df['entry_long']]['Close'],
-                        color='g', label='Entry Long', marker='^', s=100)
-            plt.scatter(df[df['entry_short']].index, df[df['entry_short']]['Close'],
-                        color='r', label='Entry Short', marker='v', s=100)
-            plt.scatter(df[df['exit']].index, df[df['exit']]['Close'],
-                        color='black', label='Exit', marker='x', s=100)
-
-            plt.legend()
-            plt.grid()
+            axes[0].scatter(df[df['entry_long']].index, df[df['entry_long']]['Close'],
+                          color='g', label='Entry Long', marker='^', s=100)
+            axes[0].scatter(df[df['entry_short']].index, df[df['entry_short']]['Close'],
+                          color='r', label='Entry Short', marker='v', s=100)
+            axes[0].scatter(df[df['exit']].index, df[df['exit']]['Close'],
+                          color='black', label='Exit', marker='x', s=100)
+            
+            axes[0].legend(loc='upper left')
+            
+            # Plot RSI
+            axes[1].plot(df.index, df['momentum_rsi'], label='RSI', color='purple')
+            axes[1].axhline(70, linestyle='--', color='red', alpha=0.5, label='Overbought (70)')
+            axes[1].axhline(30, linestyle='--', color='green', alpha=0.5, label='Oversold (30)')
+            
+            axes[1].set_title(f"{ticker} - Relative Strength Index (RSI)")
+            axes[1].set_xlabel("Date")
+            axes[1].set_ylabel("RSI Value")
+            axes[1].grid()
+            axes[1].legend(loc='upper left')
+            
+            # Plot MACD
+            axes[2].plot(df.index, df['trend_macd'], label='MACD Line', color='blue', alpha=0.7)
+            axes[2].plot(df.index, df['trend_macd_signal'], label='Signal Line', color='red', alpha=0.7)
+            axes[2].bar(df.index, df['trend_macd_diff'], label='MACD Histogram',
+                       color=df['trend_macd_diff'].apply(lambda x: 'green' if x > 0 else 'red'), alpha=0.5)
+            
+            axes[2].set_title(f'{ticker} - MACD Indicator')
+            axes[2].set_xlabel('Date')
+            axes[2].set_ylabel('MACD Value')
+            axes[2].legend(loc='upper left')
+            
             plt.tight_layout()
-
-            st.pyplot()
-            st.divider() 
-
+            plt.grid()
+            st.pyplot(fig)
+            st.divider()
+            progress_bar.progress(idx / total_plots)
+    
+     
+        
+        plot_counter.empty()
+        progress_bar.empty()
